@@ -100,3 +100,23 @@ def test_same_values_ignores_the_table_id_in_the_header():
     c = b"KEY_CODE,T001140001\r\n,x\r\n1,6\r\n"
     assert m.same_values(a, "T001100", b, "T001140")
     assert not m.same_values(a, "T001100", c, "T001140")
+
+
+def make_zip(stats_id: str, code: str, body: str) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr(f"tbl{stats_id}S{code}.txt", body.encode("cp932"))
+    return buf.getvalue()
+
+
+def test_parse_table_keeps_values_as_strings_and_strips_label_padding():
+    body = (
+        "KEY_CODE,HTKSYORI,HTKSAKI,GASSAN,T0011001\n"
+        ",,,,　人口（総数）\n"
+        "51377598,0,,,*\n"
+        "51377599,2,51377598,,12\n"
+    )
+    ids, labels, rows = m.parse_table(make_zip("T001100", "22", body), "T001100", "22")
+    assert ids[4:] == ["T0011001"]
+    assert labels[4:] == ["人口（総数）"]
+    assert rows == [["51377598", "0", "", "", "*"], ["51377599", "2", "51377598", "", "12"]]

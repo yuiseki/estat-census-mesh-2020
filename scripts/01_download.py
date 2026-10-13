@@ -101,7 +101,9 @@ def main() -> int:
         listed: dict[str, m.ListedFile] = {}
         page, pages = 1, 1
         while page <= pages:
-            frag, pag = detail(m.listing_url(t.stats_id, t.datum, page), raw, f"{t.stats_id}_{page}.json")
+            frag, pag = detail(
+                m.listing_url(t.stats_id, t.datum, page), raw, f"{t.stats_id}_{page}.json"
+            )
             pages = m.listing_pages(pag)
             listed |= {f.code: f for f in m.listing_files(frag)}
             page += 1

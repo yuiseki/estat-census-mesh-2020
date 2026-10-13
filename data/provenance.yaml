@@ -1,0 +1,7 @@
+source: 政府統計の総合窓口 (e-Stat) 統計GIS, 令和2年国勢調査, 3次メッシュ (1km)
+url: https://www.e-stat.go.jp/gis/statmap-search?page=1&type=1&toukeiCode=00200521&toukeiYear=2020&aggregateUnit=S&serveyId=S002005112020&statsId=T001100
+retrieved: 2026-10-11
+run: 2026-10-11
+terms: https://www.e-stat.go.jp/terms-of-use
+files: 564
+rows: 2134320

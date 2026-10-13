@@ -148,3 +148,15 @@ def same_values(a: bytes, a_id: str, b: bytes, b_id: str) -> bool:
     head_a, _, rest_a = a.partition(b"\n")
     head_b, _, rest_b = b.partition(b"\n")
     return head_a.replace(a_id.encode(), b_id.encode()) == head_b and rest_a == rest_b
+
+
+def parse_table(
+    data: bytes, stats_id: str, code: str
+) -> tuple[list[str], list[str], list[list[str]]]:
+    """(column ids, their Japanese labels, data rows) of a downloaded zip, every value as the
+    string the file holds (`*` is the source's mark for a hidden value). Raises NotATable."""
+    inspect_zip(data, stats_id, code)
+    with zipfile.ZipFile(io.BytesIO(data)) as z:
+        (name,) = [n for n in z.namelist() if not n.endswith("/")]
+        rows = list(csv.reader(io.StringIO(z.read(name).decode("cp932"), newline="")))
+    return rows[0], [c.strip("　 ") for c in rows[1]], rows[2:]
