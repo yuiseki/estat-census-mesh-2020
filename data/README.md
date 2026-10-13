@@ -30,13 +30,20 @@ file); credit them as 「令和2年国勢調査」(総務省統計局) を加工
 ## Two geodetic datums, two sets of tables
 
 The source publishes every table twice: on JGD2000 and on JGD2011. The two are not the same
-data. For prefectures 02 to 21 (Aomori to Gifu) the values differ in every table, while for
-01 (Hokkaido) and 22 to 47 they are the same; for example the two versions of Aomori
-(02) have mesh codes that exist in only one of them. In the three prefectures compared by
-hand (02, 13 and 22) the prefecture's total population is the same in both versions, which
-suggests the difference is in how people are assigned to meshes, but the cause is not
-confirmed. Do not merge the two versions; choose one and keep to it. Tables `T0011xx`
-below `T001140` are JGD2000, those from `T001140` on are JGD2011 (the table name says which).
+data. The Statistics Bureau says (https://www.stat.go.jp/data/mesh/pdf/ryuijikou.pdf) that the same mesh code can cover a slightly
+different area in the two datums, so results differ in 20 prefectures: Aomori, Iwate, Miyagi,
+Akita, Yamagata, Fukushima, Ibaraki, Tochigi, Gunma, Saitama, Chiba, Tokyo, Kanagawa,
+Niigata, Toyama, Ishikawa, Fukui, Yamanashi, Nagano and Gifu (codes 02 to 21). The cause is
+the assignment of small areas to meshes (同定, https://www.e-stat.go.jp/help/data-definition-information/downloaddata/help_mesh_2011.pdf): a small area that lies inside one
+mesh in JGD2000 may straddle two in JGD2011 and is then split between them in proportion.
+This copy agrees with that list: in each of the six tables exactly those 20 prefectures
+differ between the two versions (checked file by file), and in the total-population column
+the number of differing meshes runs from 81 (Fukui) to 2,164 (Miyagi). Each prefecture's total
+population is the same in both versions, so people are moved between meshes, not added.
+Meshes with no
+population have no record, so a few mesh codes exist in only one of the two versions.
+Do not merge the two versions; choose one and keep to it. The Bureau's own summary pages
+use JGD2000. The `datum` column of the table list below says which tables are which.
 
 ## Layout
 
@@ -50,9 +57,14 @@ parquet/columns.json                         each table's name, datum and the la
 The raw files are zips of one cp932 CSV each: a header line of column ids, a line of
 Japanese column labels, then one row per mesh. `KEY_CODE` is the 8-digit mesh code.
 `HTKSYORI`, `HTKSAKI` and `GASSAN` are the source's flags; in the files, `HTKSYORI` is
-`0` for most rows and `2` for rows that carry the code of another mesh in `HTKSAKI`, which
-looks like the mesh the row was merged into (this reading is from the files, not from
-e-Stat's documentation). A value of `*` is a hidden value. The Parquet files hold the same
+`0` for most rows and `2` for rows that carry the code of another mesh in `HTKSAKI`. The
+Bureau's Q&A says that the values of a mesh too small to publish are hidden (`*`) and added
+to a destination mesh whose values then are the sums, so a destination's breakdown does not
+add up to its total; which flag column marks which is read from the files, not from a
+definition sheet. `*` is a hidden value (the total population, households and household
+members are never hidden). Meshes with no population have no row. The two averages
+(mean age, median age) have one decimal place, and `Y` marks a breakdown whose ages are
+unknown. The Parquet files hold the same
 cells as strings (nothing is converted, so `*` is kept), with a `prefecture` column (the
 two-digit code) in front.
 
