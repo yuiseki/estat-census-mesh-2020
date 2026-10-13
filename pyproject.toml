@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Reproducible collection of the 2020 census grid-square statistics from e-Stat"
 requires-python = ">=3.12"
 dependencies = [
+    "huggingface-hub>=2.2.0",
     "pyarrow>=26.0.0",
 ]
 
